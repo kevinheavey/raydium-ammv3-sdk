@@ -72,16 +72,24 @@ export class CacheDataProviderImpl implements CacheDataProvider {
       );
       tickArraysToFetch.push(tickArrayAddress);
     }
-    const fetchedTickArrays =
-      (await this.program.account.tickArrayState.fetchMultiple(
-        tickArraysToFetch
-      )) as (TickArray | null)[];
-    for (const item of fetchedTickArrays) {
-      if (item) {
-        this.tickArrayCache.set(item.startTickIndex, item);
+    const everyFetch = 5
+    const fetchCount = tickArraysToFetch.length / everyFetch + 1
+    for (let i = 0; i < fetchCount; i++) {
+      let start = i * everyFetch
+      let end = start + everyFetch
+      if (end > tickArraysToFetch.length) {
+        end = tickArraysToFetch.length
+      }
+      const fetchedTickArrays =
+        (await this.program.account.tickArrayState.fetchMultiple(
+          tickArraysToFetch.slice(start, end)
+        )) as (TickArray | null)[];
+      for (const item of fetchedTickArrays) {
+        if (item) {
+          this.tickArrayCache.set(item.startTickIndex, item);
+        }
       }
     }
-    // console.log(this.tickArrayCache);
   }
 
   public setTickArrayCache(cachedTickArraies: TickArray[]) {

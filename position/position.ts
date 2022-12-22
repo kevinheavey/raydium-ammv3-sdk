@@ -322,7 +322,7 @@ function getfeeGrowthInside(
 } {
   let feeGrowthBelow0X64 = new BN(0);
   let feeGrowthBelow1X64 = new BN(0);
-  if (poolState.tickCurrent > tickLowerState.tick) {
+  if (poolState.tickCurrent >= tickLowerState.tick) {
     feeGrowthBelow0X64 = tickLowerState.feeGrowthOutside0X64;
     feeGrowthBelow1X64 = tickLowerState.feeGrowthOutside1X64;
   } else {
