@@ -2,12 +2,13 @@ import { ONE, ZERO, MaxU64, U64Resolution, Q64 } from "./constants";
 import { MathUtil } from "./mathUtil";
 // import { } from "../math/constants";
 import { BN } from "@project-serum/anchor";
+import { SqrtPriceMath } from "./sqrtPriceMath";
 
 export abstract class LiquidityMath {
   /**
    * Cannot be constructed.
    */
-  private constructor() {}
+  private constructor() { }
 
   /**
    *
@@ -46,18 +47,18 @@ export abstract class LiquidityMath {
 
     return roundUp
       ? MathUtil.mulDivRoundingUp(
-          MathUtil.mulDivCeil(numerator1, numerator2, sqrtPriceBX64),
-          ONE,
-          sqrtPriceAX64
-        )
+        MathUtil.mulDivCeil(numerator1, numerator2, sqrtPriceBX64),
+        ONE,
+        sqrtPriceAX64
+      )
       : MathUtil.mulDivFloor(numerator1, numerator2, sqrtPriceBX64).div(
-          sqrtPriceAX64
-        );
+        sqrtPriceAX64
+      );
   }
 
   /**
    * Calculates Δy = ΔL * (√P_upper - √P_lower)
-   * @param sqrtPriceAX64
+   * @param sqrtPriceAX64 
    * @param sqrtPriceBX64
    * @param liquidity
    * @param roundUp
@@ -104,33 +105,33 @@ export abstract class LiquidityMath {
     if (sqrtPriceCurrentX64.lte(sqrtPriceAX64)) {
       return isToken0
         ? LiquidityMath.getLiquidityFromToken0Amount(
-            sqrtPriceAX64,
-            sqrtPriceBX64,
-            amount,
-            false
-          )
+          sqrtPriceAX64,
+          sqrtPriceBX64,
+          amount,
+          false
+        )
         : new BN(0);
     } else if (sqrtPriceCurrentX64.lt(sqrtPriceBX64)) {
       return isToken0
         ? LiquidityMath.getLiquidityFromToken0Amount(
-            sqrtPriceCurrentX64,
-            sqrtPriceBX64,
-            amount,
-            false
-          )
+          sqrtPriceCurrentX64,
+          sqrtPriceBX64,
+          amount,
+          false
+        )
         : LiquidityMath.getLiquidityFromToken1Amount(
-            sqrtPriceAX64,
-            sqrtPriceCurrentX64,
-            amount
-          );
+          sqrtPriceAX64,
+          sqrtPriceCurrentX64,
+          amount
+        );
     } else {
       return isToken0
         ? new BN(0)
         : LiquidityMath.getLiquidityFromToken1Amount(
-            sqrtPriceAX64,
-            sqrtPriceBX64,
-            amount
-          );
+          sqrtPriceAX64,
+          sqrtPriceBX64,
+          amount
+        );
     }
   }
 
@@ -230,13 +231,24 @@ export abstract class LiquidityMath {
     }
   }
 
+  /**
+   *  It is used when increase or decrease liquidity
+   * @param sqrtPriceCurrentX64  the current price
+   * @param tickA tick boundary
+   * @param tickB tick boundary
+   * @param liquidity  the current active liquidity
+   * @param roundUp true: increase liquidity, false: decrease liquidity
+   * @returns 
+   */
   public static getAmountsFromLiquidity(
     sqrtPriceCurrentX64: BN,
-    sqrtPriceAX64: BN,
-    sqrtPriceBX64: BN,
+    tickA: number,
+    tickB: number,
     liquidity: BN,
     roundUp: boolean
   ): [BN, BN] {
+    let sqrtPriceAX64 = SqrtPriceMath.getSqrtPriceX64FromTick(tickA);
+    let sqrtPriceBX64 = SqrtPriceMath.getSqrtPriceX64FromTick(tickB);
     if (sqrtPriceAX64.gt(sqrtPriceBX64)) {
       [sqrtPriceAX64, sqrtPriceBX64] = [sqrtPriceBX64, sqrtPriceAX64];
     }
@@ -280,8 +292,8 @@ export abstract class LiquidityMath {
 
   public static getAmountsFromLiquidityWithSlippage(
     sqrtPriceCurrentX64: BN,
-    sqrtPriceAX64: BN,
-    sqrtPriceBX64: BN,
+    tickA: number,
+    tickB: number,
     liquidity: BN,
     amountMax: boolean,
     roundUp: boolean,
@@ -289,8 +301,8 @@ export abstract class LiquidityMath {
   ): [BN, BN] {
     const [token0Amount, token1Amount] = LiquidityMath.getAmountsFromLiquidity(
       sqrtPriceCurrentX64,
-      sqrtPriceAX64,
-      sqrtPriceBX64,
+      tickA,
+      tickB,
       liquidity,
       roundUp
     );

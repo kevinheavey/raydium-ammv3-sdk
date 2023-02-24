@@ -109,7 +109,7 @@ type PrepareOnePoolResult = {
 };
 
 export class AmmInstruction {
-  private constructor() {}
+  private constructor() { }
 
   /**
    *
@@ -537,8 +537,8 @@ export class AmmInstruction {
     const [amount0Max, amount1Max] =
       LiquidityMath.getAmountsFromLiquidityWithSlippage(
         poolState.sqrtPriceX64,
-        SqrtPriceMath.getSqrtPriceX64FromTick(tickLowerIndex),
-        SqrtPriceMath.getSqrtPriceX64FromTick(tickUpperIndex),
+        tickLowerIndex,
+        tickUpperIndex,
         liquidity,
         true,
         true,
@@ -706,8 +706,8 @@ export class AmmInstruction {
     const [amount0Max, amount1Max] =
       LiquidityMath.getAmountsFromLiquidityWithSlippage(
         poolState.sqrtPriceX64,
-        SqrtPriceMath.getSqrtPriceX64FromTick(tickLowerIndex),
-        SqrtPriceMath.getSqrtPriceX64FromTick(tickUpperIndex),
+        tickLowerIndex,
+        tickUpperIndex,
         liquidity,
         true,
         true,
@@ -898,16 +898,12 @@ export class AmmInstruction {
     const ctx = ammPool.ctx;
     const tickLowerIndex = positionState.tickLowerIndex;
     const tickUpperIndex = positionState.tickUpperIndex;
-    const sqrtPriceLowerX64 =
-      SqrtPriceMath.getSqrtPriceX64FromTick(tickLowerIndex);
-    const sqrtPriceUpperX64 =
-      SqrtPriceMath.getSqrtPriceX64FromTick(tickUpperIndex);
 
     const [amount0Min, amount1Min] =
       LiquidityMath.getAmountsFromLiquidityWithSlippage(
         ammPool.poolState.sqrtPriceX64,
-        sqrtPriceLowerX64,
-        sqrtPriceUpperX64,
+        tickLowerIndex,
+        tickUpperIndex,
         liquidity,
         false,
         false,
