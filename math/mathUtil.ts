@@ -25,10 +25,12 @@ export abstract class MathUtil {
   }
 
   public static mulDivCeil(a: BN, b: BN, denominator: BN): BN {
+    // console.log(`mulDivCeil params: a: ${a.toString()}; b: ${b.toString()}; c: ${denominator.toString()}`);
     if (denominator.eq(ZERO)) {
       throw new Error("division by 0");
     }
     const numerator = a.mul(b).add(denominator.sub(ONE));
+    // console.log(`mulDivCeil result: a: ${numerator.div(denominator).toString()}`);
     return numerator.div(denominator);
   }
 
