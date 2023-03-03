@@ -4,7 +4,7 @@
   "description": "raydium v3 sdk",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "ts-mocha entities/tickArray.test.ts"
   },
   "dependencies": {
     "@metaplex/js": "4.9.0",
