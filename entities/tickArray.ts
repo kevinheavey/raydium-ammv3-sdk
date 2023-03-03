@@ -87,6 +87,16 @@ export function getTickArrayOffsetInBitmapByTick(
   return Math.abs(compressed);
 }
 
+export function calcBitPosAndMultiplier(
+  tick: number,
+  tickSpacing: number
+): [number, number] {
+  let multiplier = tickSpacing * TICK_ARRAY_SIZE;
+  let compressed = Math.floor(tick / multiplier) + 512;
+  let bit_pos = Math.abs(compressed);
+  return [bit_pos, multiplier]
+}
+
 /**
  *
  * @param bitmap
@@ -99,9 +109,7 @@ export function checkTickArrayIsInitialized(
   tick: number,
   tickSpacing: number
 ): [boolean, number] {
-  let multiplier = tickSpacing * TICK_ARRAY_SIZE;
-  let compressed = Math.floor(tick / multiplier) + 512;
-  let bit_pos = Math.abs(compressed);
+  let [bit_pos, multiplier] = calcBitPosAndMultiplier(tick, tickSpacing);
   return [bitmap.testn(bit_pos), (bit_pos - 512) * multiplier];
 }
 
