@@ -2,6 +2,8 @@ import {
   getInitializedTickArrayInRange,
   mergeTickArrayBitmap,
   checkTickArrayIsInitialized,
+  getTickArrayStartIndexByTick,
+  calcBitPosAndMultiplier
 } from "./tickArray";
 
 import { assert, expect } from "chai";
@@ -30,7 +32,7 @@ describe("tick array test", async () => {
     let bitmap = mergeTickArrayBitmap(bns);
     assert.deepEqual(
       getInitializedTickArrayInRange(bitmap, 10, 0, 7),
-      [-800, -1600, -2400, -51200, -52000, -409600, 0, 800, 1600, 51200, 408800]
+      [-600, -1200, -1800, -38400, -39000, -307200, 0, 600, 1200, 38400, 306600]
     );
   });
 
@@ -60,17 +62,29 @@ describe("tick array test", async () => {
       10
     );
     assert.equal(isInitialized, true);
+    let [bit_pos, multiplier] = calcBitPosAndMultiplier(-800, 10);
+    assert.equal(bit_pos, 510);
+    assert.equal(multiplier, 600);
     [isInitialized, startIndex] = checkTickArrayIsInitialized(bitmap, -800, 10);
     assert.equal(isInitialized, true);
-    assert.equal(startIndex, -800);
+    assert.equal(startIndex, -1200);
+    [bit_pos, multiplier] = calcBitPosAndMultiplier(-20, 10);
+    assert.equal(bit_pos, 511);
+    assert.equal(multiplier, 600);
     [isInitialized, startIndex] = checkTickArrayIsInitialized(bitmap, -20, 10);
     assert.equal(isInitialized, true);
-    assert.equal(startIndex, -800);
+    assert.equal(startIndex, -600);
     [isInitialized, startIndex] = checkTickArrayIsInitialized(bitmap, 20, 10);
     assert.equal(isInitialized, true);
     assert.equal(startIndex, 0);
     [isInitialized, startIndex] = checkTickArrayIsInitialized(bitmap, 800, 10);
     assert.equal(isInitialized, true);
-    assert.equal(startIndex, 800);
+    assert.equal(startIndex, 600);
   });
+
+  it("tick index wat", function() {
+    assert.equal(getTickArrayStartIndexByTick(100, 3), 0);
+    assert.equal(getTickArrayStartIndexByTick(180, 3), 180);
+    assert.equal(getTickArrayStartIndexByTick(180.2, 3), 180);
+  })
 });
