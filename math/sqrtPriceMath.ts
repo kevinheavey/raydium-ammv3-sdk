@@ -23,8 +23,10 @@ function mulRightShift(val: BN, mulBy: BN): BN {
 }
 
 function signedLeftShift(n0: BN, shiftBy: number, bitWidth: number) {
+  // console.log(`signedLeftShift param`, n0.toString());
   let twosN0 = n0.toTwos(bitWidth).shln(shiftBy);
   twosN0.imaskn(bitWidth + 1);
+  // console.log(`signedLeftShift result`, twosN0.fromTwos(bitWidth).toString())
   return twosN0.fromTwos(bitWidth);
 }
 
@@ -81,7 +83,7 @@ export abstract class SqrtPriceMath {
       throw new Error("liquidity must greater than 0");
     }
 
-    return zeroForOne
+    const result = zeroForOne
       ? this.getNextSqrtPriceFromToken0AmountRoundingUp(
           sqrtPriceX64,
           liquidity,
@@ -94,6 +96,7 @@ export abstract class SqrtPriceMath {
           amountIn,
           true
         );
+    return result;
   }
 
   /**
@@ -117,7 +120,7 @@ export abstract class SqrtPriceMath {
       throw new Error("liquidity must greater than 0");
     }
 
-    return zeroForOne
+    const result = zeroForOne
       ? this.getNextSqrtPriceFromToken1AmountRoundingDown(
           sqrtPriceX64,
           liquidity,
@@ -130,6 +133,8 @@ export abstract class SqrtPriceMath {
           amountOut,
           false
         );
+    return result
+    
   }
 
   /**
@@ -280,6 +285,7 @@ export abstract class SqrtPriceMath {
    * @returns
    */
   public static getTickFromSqrtPriceX64(sqrtPriceX64: BN): number {
+    // console.log("getTickFromSqrtPriceX64 param: ", sqrtPriceX64.toString());
     if (
       sqrtPriceX64.gt(MAX_SQRT_PRICE_X64) ||
       sqrtPriceX64.lt(MIN_SQRT_PRICE_X64)
@@ -326,14 +332,17 @@ export abstract class SqrtPriceMath {
     ).toNumber();
 
     if (tickLow == tickHigh) {
+      // console.log("getTickFromSqrtPriceX64 result: ", tickLow.toString());
       return tickLow;
     } else {
       const derivedTickHighSqrtPriceX64 = new BN(
         SqrtPriceMath.getSqrtPriceX64FromTick(tickHigh).toString()
       );
       if (derivedTickHighSqrtPriceX64.lte(sqrtPriceX64)) {
+        // console.log("getTickFromSqrtPriceX64 result: ", tickHigh.toString());
         return tickHigh;
       } else {
+        // console.log("getTickFromSqrtPriceX64 result: ", tickLow.toString());
         return tickLow;
       }
     }

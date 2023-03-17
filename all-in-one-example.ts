@@ -90,6 +90,7 @@ export async function main() {
     6
   );
   console.log("createPool tx:", poolTx);
+  console.log("poolAAddress: ", poolAAddress.toBase58());
 
   const ammPoolA = new AmmPool(ctx, poolAAddress, stateFetcher);
 

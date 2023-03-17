@@ -2,6 +2,8 @@ import { PublicKey } from "@solana/web3.js";
 import { Tick, TickArray } from "./tickArray";
 
 export interface CacheDataProvider {
+  tickArrayCache: Map<number, TickArray | undefined>;
+  poolAddress: PublicKey;
   /**
    *
    * @param tickArray

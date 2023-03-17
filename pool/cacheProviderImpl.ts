@@ -103,6 +103,7 @@ export class CacheDataProviderImpl implements CacheDataProvider {
    * @param startIndex
    */
   getTickArray(startIndex: number): TickArray | undefined {
+    // console.log(`tickArrayCache: ${JSON.stringify(Object.fromEntries(this.tickArrayCache))}`);
     return this.tickArrayCache.get(startIndex);
   }
 
@@ -118,6 +119,7 @@ export class CacheDataProviderImpl implements CacheDataProvider {
     tickSpacing: number,
     zeroForOne: boolean
   ): Promise<[Tick, PublicKey, number]> {
+    // console.log(`nextInitializedTick params: tickIndex: ${tickIndex}; tickSpacing: ${tickSpacing}; zeroForOne: ${zeroForOne}`);
     let {
       initializedTick: nextTick,
       tickArrayAddress,
@@ -151,6 +153,7 @@ export class CacheDataProviderImpl implements CacheDataProvider {
     if (nextTick == undefined) {
       throw new Error("No invaild tickArray cache");
     }
+    // console.log(`nextInitializedTick result: ${JSON.stringify([nextTick, tickArrayAddress, tickArrayStartTickIndex])}`);
     return [nextTick, tickArrayAddress, tickArrayStartTickIndex];
   }
 
@@ -158,6 +161,8 @@ export class CacheDataProviderImpl implements CacheDataProvider {
     tickArray: TickArray,
     zeroForOne: boolean
   ): Promise<[Tick, PublicKey, number]> {
+    const filteredTicks = tickArray.ticks.filter((t) => !t.liquidityNet.eq(new BN("0")));
+    // console.log(`firstInitializedTickInOneArray params: filteredTicks: ${JSON.stringify(filteredTicks)}; zeroForOne: ${zeroForOne}; startIndex: ${tickArray.startTickIndex}`);
     let nextInitializedTick: Tick;
     if (zeroForOne) {
       let i = TICK_ARRAY_SIZE - 1;
@@ -185,6 +190,7 @@ export class CacheDataProviderImpl implements CacheDataProvider {
       this.program.programId,
       tickArray.startTickIndex
     );
+    // console.log("nextInitializedTick.liquidityNet", nextInitializedTick.liquidityNet.toString());
     return [nextInitializedTick, tickArrayAddress, tickArray.startTickIndex];
   }
 
@@ -204,12 +210,14 @@ export class CacheDataProviderImpl implements CacheDataProvider {
     tickArrayAddress: PublicKey | undefined;
     tickArrayStartTickIndex: number;
   }> {
+    // console.log(`nextInitializedTickInOneArray params: tickIndex: ${tickIndex}; tickSpacing: ${tickSpacing}; zeroForOne: ${zeroForOne}`);
     const startIndex = getTickArrayStartIndexByTick(tickIndex, tickSpacing);
     let tickPositionInArray = Math.floor(
       (tickIndex - startIndex) / tickSpacing
     );
     const cachedTickArray = this.getTickArray(startIndex);
     if (cachedTickArray == undefined) {
+      console.log("undefined cached");
       return {
         initializedTick: undefined,
         tickArrayAddress: undefined,
@@ -242,6 +250,7 @@ export class CacheDataProviderImpl implements CacheDataProvider {
       this.program.programId,
       startIndex
     );
+    // console.log(`nextInitializedTickInOneArray result: initializedTick: ${JSON.stringify(nextInitializedTick)}; tickArrayAddress: ${tickArrayAddress.toBase58()}; tickArrayStartTickIndex: ${cachedTickArray.startTickIndex}`);
     return {
       initializedTick: nextInitializedTick,
       tickArrayAddress,

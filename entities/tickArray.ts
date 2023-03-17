@@ -135,6 +135,7 @@ export function getNextTickArrayStartIndex(
 }
 
 export function mergeTickArrayBitmap(bns: BN[]) {
+  // console.log(`bns: ${bns.map((x) => x.toString())}`);
   return bns[0]
     .add(bns[1].shln(64))
     .add(bns[2].shln(128))
@@ -167,6 +168,7 @@ export function getInitializedTickArrayInRange(
   tickArrayStartIndex: number,
   expectedCount: number
 ): number[] {
+  // console.log(`getInitializedTickArrayInRange params: tickArrayBitmap: ${tickArrayBitmap.toString()}; tickSpacing: ${tickSpacing}; tickArrayStartIndex: ${tickArrayStartIndex}; expectedCount: ${expectedCount}`);
   if (tickArrayStartIndex % (tickSpacing * TICK_ARRAY_SIZE) != 0) {
     throw new Error("Invild tickArrayStartIndex");
   }
@@ -175,6 +177,14 @@ export function getInitializedTickArrayInRange(
   let result: number[] = [];
 
   // find right of currenct offset
+  // console.log(`searchLowBitFromStart params: tickArrayBitmap: ${tickArrayBitmap.toString()}; start: ${tickArrayOffset - 1}; end: 0; expectedCount: ${expectedCount}; tickSpacing: ${tickSpacing}`);
+  // console.log(`searchLowBitFromStart result: ${JSON.stringify(searchLowBitFromStart(
+  //   tickArrayBitmap,
+  //   tickArrayOffset - 1,
+  //   0,
+  //   expectedCount,
+  //   tickSpacing
+  // ))}`);
   result.push(
     ...searchLowBitFromStart(
       tickArrayBitmap,
@@ -185,6 +195,14 @@ export function getInitializedTickArrayInRange(
     )
   );
   // find left of current offset
+  // console.log(`searchHighBitFromStart params: tickArrayBitmap: ${tickArrayBitmap.toString()}; start: ${tickArrayOffset}; end: ${TICK_ARRAY_BITMAP_SIZE}; expectedCount: ${expectedCount}; tickSpacing: ${tickSpacing}`);
+  // console.log(`searchHighBitFromStart result: ${JSON.stringify(searchHightBitFromStart(
+  //   tickArrayBitmap,
+  //   tickArrayOffset,
+  //   TICK_ARRAY_BITMAP_SIZE,
+  //   expectedCount,
+  //   tickSpacing
+  // ))}`);
   result.push(
     ...searchHightBitFromStart(
       tickArrayBitmap,
@@ -194,7 +212,7 @@ export function getInitializedTickArrayInRange(
       tickSpacing
     )
   );
-
+  // console.log("getInitializedTickArrayInRange result", result.toString());
   return result;
 }
 
@@ -267,10 +285,12 @@ export function searchLowBitFromStart(
   expectedCount: number,
   tickSpacing: number
 ): number[] {
+  // console.log(`searchLowBitFromStart params: tickArrayBitmap: ${tickArrayBitmap.toString()}; start: ${start}; end: ${end}; expectedCount: ${expectedCount}; tickSpacing: ${tickSpacing}`);
   let fetchNum: number = 0;
   let result: number[] = [];
   for (let i = start; i >= end; i--) {
     if (tickArrayBitmap.shrn(i).and(new BN(1)).eqn(1)) {
+      console.log("i", i);
       let nextStartIndex = (i - 512) * (tickSpacing * TICK_ARRAY_SIZE);
       result.push(nextStartIndex);
       fetchNum++;
@@ -279,6 +299,7 @@ export function searchLowBitFromStart(
       break;
     }
   }
+  // console.log(`searchLowBitFromStart result: ${JSON.stringify(result)}`);
   return result;
 }
 
@@ -289,6 +310,7 @@ export function searchHightBitFromStart(
   expectedCount: number,
   tickSpacing: number
 ): number[] {
+  // console.log(`searchHighBitFromStart params: tickArrayBitmap: ${tickArrayBitmap.toString()}; start: ${start}; end: ${end}; expectedCount: ${expectedCount}; tickSpacing: ${tickSpacing}`);
   let fetchNum: number = 0;
   let result: number[] = [];
   for (let i = start; i < end; i++) {
@@ -301,5 +323,6 @@ export function searchHightBitFromStart(
       break;
     }
   }
+  // console.log(`searchHighBitFromStart result: ${JSON.stringify(result)}`);
   return result;
 }

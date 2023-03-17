@@ -223,6 +223,10 @@ export class AmmPool {
       throw new Error("Invalid tick array");
     }
     allNeededAccounts.push(nextAccountMeta);
+    if (sqrtPriceLimitX64) { 
+      if (sqrtPriceLimitX64.lte(this.poolState.sqrtPriceX64)) {
+      console.log(`ERROR in getOutputAmountAndRemainAccounts: sqrtPriceLimitX64: ${sqrtPriceLimitX64.toString()} is less than sqrtPriceX64: ${this.poolState.sqrtPriceX64.toString()}`);
+    }}
     const {
       amountCalculated: outputAmount,
       feeAmount: inputFeeAmount,
@@ -287,6 +291,10 @@ export class AmmPool {
       throw new Error("Invalid tick array");
     }
     allNeededAccounts.push(nextAccountMeta);
+    if (sqrtPriceLimitX64) { 
+      if (sqrtPriceLimitX64.lte(this.poolState.sqrtPriceX64)) {
+      console.log(`ERROR in getInputAmountAndRemainAccounts: sqrtPriceLimitX64: ${sqrtPriceLimitX64.toString()} is less than sqrtPriceX64: ${this.poolState.sqrtPriceX64.toString()}`);
+    }}
     const {
       amountCalculated: inputAmount,
       feeAmount: inputFeeAmount,

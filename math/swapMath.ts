@@ -64,6 +64,8 @@ export abstract class SwapMath {
     tickCurrent: number;
     accounts: AccountMeta[];
   }> {
+    // console.log(`tickArrayCache: ${JSON.stringify(Object.fromEntries(cacheDataProvider.tickArrayCache))}`)
+    // console.log(`swapCompute params: zero_for_one: ${zeroForOne}; fee: ${fee}; liquidity: ${liquidity.toString()}; currentTick: ${currentTick}; tickSpacing: ${tickSpacing}; currentSqrtPriceX64: ${currentSqrtPriceX64.toString()}; amountSpecified: ${amountSpecified.toString()}; lastSavedTickArrayStartIndex: ${lastSavedTickArrayStartIndex}; sqrtPriceLimitX64: ${JSON.stringify(sqrtPriceLimitX64)}; poolAddress: ${cacheDataProvider.poolAddress}; programId: ${cacheDataProvider['program']['programId']}`);
     if (amountSpecified.eq(ZERO)) {
       throw new Error("amountSpecified must not be 0");
     }
@@ -86,6 +88,8 @@ export abstract class SwapMath {
       }
 
       if (sqrtPriceLimitX64.lte(currentSqrtPriceX64)) {
+        console.log("sqrtPriceLimitX64", sqrtPriceLimitX64.toString());
+        console.log("currentSqrtPriceX64", currentSqrtPriceX64.toString());
         throw new Error("sqrtPriceX64 must greater than current");
       }
     }
@@ -109,6 +113,7 @@ export abstract class SwapMath {
       state.tick > MIN_TICK
     ) {
       if (loopCount > 10) {
+        console.log("throwing here");
         throw Error("liquidity limit");
       }
       let step: Partial<StepComputations> = {};
@@ -187,6 +192,7 @@ export abstract class SwapMath {
       }
       ++loopCount;
     }
+    console.log(`swapCompute result: amountCalculated: ${state.amountCalculated.toString()}; feeAmount: ${state.feeAmount.toString()}; sqrtPriceX64: ${state.sqrtPriceX64.toString()}; liquidity: ${state.liquidity.toString()}; tickCurrent: ${state.tick}; accounts: ${JSON.stringify(state.accounts)}`)
     return {
       amountCalculated: state.amountCalculated,
       feeAmount: state.feeAmount,
@@ -314,11 +320,13 @@ export abstract class SwapMath {
     if (baseInput && !swapStep.sqrtPriceX64Next.eq(sqrtPriceX64Target)) {
       swapStep.feeAmount = amountRemaining.sub(swapStep.amountIn);
     } else {
+      console.log(`mulDivCeil params: ${[swapStep.amountIn.toString(), feeRate, FEE_RATE_DENOMINATOR.sub(new BN(feeRate)).toString()]}`);
       swapStep.feeAmount = MathUtil.mulDivCeil(
         swapStep.amountIn,
         new BN(feeRate),
         FEE_RATE_DENOMINATOR.sub(new BN(feeRate))
       );
+      console.log(`mulDivCeil result: ${swapStep.feeAmount.toString()}`);
     }
     return [
       swapStep.sqrtPriceX64Next,

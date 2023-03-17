@@ -9,6 +9,16 @@ import {
 import { assert, expect } from "chai";
 import { BN } from "@project-serum/anchor";
 
+function signedRightShift(n0: BN, shiftBy: number, bitWidth: number) {
+  let twoN0 = n0.toTwos(bitWidth).shrn(shiftBy);
+  twoN0.imaskn(bitWidth - shiftBy + 1);
+  return twoN0.fromTwos(bitWidth - shiftBy);
+}
+
+function signedRightShiftNoTwos(n0: BN, shiftBy: number, bitWidth: number) {
+  return n0.shrn(shiftBy).imaskn(bitWidth - shiftBy + 1);
+}
+
 describe("tick array test", async () => {
   it("getInitializedTickArrayInRange", () => {
     let bns: BN[] = [
@@ -86,5 +96,9 @@ describe("tick array test", async () => {
     assert.equal(getTickArrayStartIndexByTick(100, 3), 0);
     assert.equal(getTickArrayStartIndexByTick(180, 3), 180);
     assert.equal(getTickArrayStartIndexByTick(180.2, 3), 180);
-  })
+  });
+
+  // it("signedRightShift", function() {
+  //   assert.equal()
+  // })
 });

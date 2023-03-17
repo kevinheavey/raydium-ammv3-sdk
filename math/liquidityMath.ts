@@ -45,7 +45,7 @@ export abstract class LiquidityMath {
     const numerator1 = liquidity.ushln(U64Resolution);
     const numerator2 = sqrtPriceBX64.sub(sqrtPriceAX64);
 
-    return roundUp
+    const result = roundUp
       ? MathUtil.mulDivRoundingUp(
         MathUtil.mulDivCeil(numerator1, numerator2, sqrtPriceBX64),
         ONE,
@@ -54,6 +54,7 @@ export abstract class LiquidityMath {
       : MathUtil.mulDivFloor(numerator1, numerator2, sqrtPriceBX64).div(
         sqrtPriceAX64
       );
+    return result;
   }
 
   /**
@@ -77,9 +78,10 @@ export abstract class LiquidityMath {
       throw new Error("sqrtPriceAX64 must greater than 0");
     }
 
-    return roundUp
+    const result = roundUp
       ? MathUtil.mulDivCeil(liquidity, sqrtPriceBX64.sub(sqrtPriceAX64), Q64)
       : MathUtil.mulDivFloor(liquidity, sqrtPriceBX64.sub(sqrtPriceAX64), Q64);
+    return result;
   }
 
   /**
